@@ -33,15 +33,17 @@ func (*CasbinRule) TableName() string {
 // NewCasbinGoroseAdapter is the constructor for Adapter.
 func NewAdapter(ge *gorose.Engin) *CasbinGoroseAdapter {
 	cga := &CasbinGoroseAdapter{ge}
-	// 建表，如果不存在的话
+	// 建表，如果是mysql驱动的话
 	if err := cga.createTable(); err != nil {
 		panic(err.Error())
 	}
 	return cga
 }
 
-func (a *CasbinGoroseAdapter) createTable() error {
-	sqlStr := `CREATE TABLE IF NOT EXISTS casbin_rule (
+func (a *CasbinGoroseAdapter) createTable() (err error) {
+	// 如果传入的驱动是mysql，则执行此操作
+	if a.Engin.GetDriver() == gorose.DriverMysql {
+		sqlStr := `CREATE TABLE IF NOT EXISTS casbin_rule (
   id int(11) NOT NULL AUTO_INCREMENT,
   p_type varchar(32) NOT NULL DEFAULT '' COMMENT 'perm类型：p,g......',
   v0 varchar(64) NOT NULL DEFAULT '' COMMENT '角色名字...',
@@ -52,9 +54,10 @@ func (a *CasbinGoroseAdapter) createTable() error {
   v5 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;`
-	_, err := a.Engin.NewSession().Execute(sqlStr)
+		_, err = a.Engin.NewSession().Execute(sqlStr)
+	}
 
-	return err
+	return
 }
 
 // LoadPolicy loads all policy rules from the storage.

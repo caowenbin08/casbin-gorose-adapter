@@ -49,3 +49,20 @@ func main() {
 	//e.SavePolicy()
 }
 ```
+
+## generate table
+now, only mysql driver can auto generate table, the table sql like :  
+
+```sql
+CREATE TABLE IF NOT EXISTS casbin_rule (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  p_type varchar(32) NOT NULL DEFAULT '' COMMENT 'perm类型：p,g......',
+  v0 varchar(64) NOT NULL DEFAULT '' COMMENT '角色名字...',
+  v1 varchar(64) NOT NULL DEFAULT '' COMMENT '对象资源...',
+  v2 varchar(64) NOT NULL DEFAULT '' COMMENT '权限值...',
+  v3 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
+  v4 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
+  v5 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
