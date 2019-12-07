@@ -128,14 +128,12 @@ func (a *CasbinGoroseAdapter) builCasbinRule(ptype string, rule []string) (cr Ca
 		return
 	}
 	cr.PType = ptype
-	switch {
-	case length>0: cr.V0 = rule[0]; fallthrough
-	case length>1: cr.V1 = rule[1]; fallthrough
-	case length>2: cr.V2 = rule[2]; fallthrough
-	case length>3: cr.V3 = rule[3]; fallthrough
-	case length>4: cr.V4 = rule[4]; fallthrough
-	case length>5: cr.V5 = rule[5]
-	}
+	if length>0 {cr.V0 = rule[0]}
+	if length>1 {cr.V1 = rule[1]}
+	if length>2 {cr.V2 = rule[2]}
+	if length>3 {cr.V3 = rule[3]}
+	if length>4 {cr.V4 = rule[4]}
+	if length>5 {cr.V5 = rule[5]}
 	return
 }
 
