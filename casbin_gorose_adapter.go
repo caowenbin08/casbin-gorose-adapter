@@ -43,7 +43,7 @@ func NewAdapter(ge *gorose.Engin) *CasbinGoroseAdapter {
 func (a *CasbinGoroseAdapter) createTable() (err error) {
 	// 如果传入的驱动是mysql，则执行此操作
 	if a.Engin.GetDriver() == gorose.DriverMysql {
-		sqlStr := `CREATE TABLE IF NOT EXISTS casbin_rule (
+		sqlStr := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s%s (
   id int(11) NOT NULL AUTO_INCREMENT,
   p_type varchar(32) NOT NULL DEFAULT '' COMMENT 'perm类型：p,g......',
   v0 varchar(64) NOT NULL DEFAULT '' COMMENT '角色名字...',
@@ -53,7 +53,7 @@ func (a *CasbinGoroseAdapter) createTable() (err error) {
   v4 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
   v5 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
   PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;`
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;`, a.GetPrefix(),"casbin_rule")
 		_, err = a.Engin.NewSession().Execute(sqlStr)
 	}
 
