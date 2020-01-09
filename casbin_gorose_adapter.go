@@ -26,7 +26,7 @@ type CasbinRule struct {
 	V5          string `gorose:"v5"`
 }
 // TableName return table's true name
-func (*CasbinRule) TableName() string {
+func (CasbinRule) TableName() string {
 	return "casbin_rule"
 }
 
@@ -183,7 +183,7 @@ func (a *CasbinGoroseAdapter) rawDelete(line *CasbinRule) error {
 	if line.V4 != "" { where["v4"] = line.V4 }
 	if line.V5 != "" { where["v5"] = line.V5 }
 
-	aff,err := a.Engin.NewOrm().Where(where).Delete()
+	aff,err := a.Engin.NewOrm().Table(line).Where(where).Delete()
 	if err!=nil {
 		return err
 	}
