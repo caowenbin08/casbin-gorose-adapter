@@ -173,7 +173,7 @@ func (a *CasbinGoroseAdapter) RemoveFilteredPolicy(sec string, ptype string, fie
 }
 
 func (a *CasbinGoroseAdapter) rawDelete(line *CasbinRule) error {
-	var where = make(map[string]string)
+	var where = gorose.Data{}
 	where["p_type"] = line.PType
 
 	if line.V0 != "" { where["v0"] = line.V0 }
