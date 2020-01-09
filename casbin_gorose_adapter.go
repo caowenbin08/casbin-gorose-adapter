@@ -91,7 +91,7 @@ func (a *CasbinGoroseAdapter) SavePolicy(model model.Model) error {
 		}
 	}
 
-	aff, e := a.Engin.NewOrm().Insert(cr)
+	aff, e := a.Engin.NewOrm().Insert(&cr)
 	if e!=nil {
 		return e
 	}
