@@ -183,7 +183,8 @@ func (a *CasbinGoroseAdapter) rawDelete(line *CasbinRule) error {
 	if line.V4 != "" { where["v4"] = line.V4 }
 	if line.V5 != "" { where["v5"] = line.V5 }
 
-	aff,err := a.Engin.NewOrm().Table(line).Where(where).Delete()
+	var db = a.Engin.NewOrm()
+	aff,err := db.Table(line).Where(where).Delete()
 	if err!=nil {
 		return err
 	}
