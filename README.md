@@ -27,11 +27,12 @@ import (
 )
 
 func main() {
-	// 初始化数据库
-	engin, _ := gorose.Open(gorose.Config{Driver: "mysql", 
+	// init db orm
+	engin, _ := gorose.Open(&gorose.Config{Driver: "mysql", 
 		Dsn: "root:root@tcp(localhost:3306)/test?charset=utf8&parseTime=true"})
 
-	// 初始化casbin适配器
+	// init casbin adapter
+	// model can use in source code as `github.com/casbin/casbin/v2/model.NewModel().AddDef("r","r","sub, obj, act")`
 	e, _ := casbin.NewEnforcer("./model.conf", cga.NewAdapter(engin))
 
 	sub, obj, act := "fizz", "data1", "read"
@@ -55,14 +56,14 @@ now, only mysql driver can auto generate table, the table sql like :
 
 ```sql
 CREATE TABLE IF NOT EXISTS casbin_rule (
-  id int(11) NOT NULL AUTO_INCREMENT,
-  p_type varchar(32) NOT NULL DEFAULT '' COMMENT 'perm类型：p,g......',
-  v0 varchar(64) NOT NULL DEFAULT '' COMMENT '角色名字...',
-  v1 varchar(64) NOT NULL DEFAULT '' COMMENT '对象资源...',
-  v2 varchar(64) NOT NULL DEFAULT '' COMMENT '权限值...',
-  v3 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
-  v4 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
-  v5 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+ id int(11) NOT NULL AUTO_INCREMENT,
+ p_type varchar(32) NOT NULL DEFAULT '' COMMENT 'perm类型：p,g......',
+ v0 varchar(64) NOT NULL DEFAULT '' COMMENT '角色名字(rbac),其他角色类型则依次存放v0-v5...',
+ v1 varchar(64) NOT NULL DEFAULT '' COMMENT '对象资源(rbac),其他角色类型则依次存放v0-v5...',
+ v2 varchar(64) NOT NULL DEFAULT '' COMMENT '权限值(rbac),其他角色类型则依次存放v0-v5...',
+ v3 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
+ v4 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
+ v5 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
+ PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='casbin权限规则表';
 ```

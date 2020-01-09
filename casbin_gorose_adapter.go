@@ -46,14 +46,14 @@ func (a *CasbinGoroseAdapter) createTable() (err error) {
 		sqlStr := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s%s (
   id int(11) NOT NULL AUTO_INCREMENT,
   p_type varchar(32) NOT NULL DEFAULT '' COMMENT 'perm类型：p,g......',
-  v0 varchar(64) NOT NULL DEFAULT '' COMMENT '角色名字...',
-  v1 varchar(64) NOT NULL DEFAULT '' COMMENT '对象资源...',
-  v2 varchar(64) NOT NULL DEFAULT '' COMMENT '权限值...',
+  v0 varchar(64) NOT NULL DEFAULT '' COMMENT '角色名字(rbac),其他角色类型则依次存放v0-v5...',
+  v1 varchar(64) NOT NULL DEFAULT '' COMMENT '对象资源(rbac),其他角色类型则依次存放v0-v5...',
+  v2 varchar(64) NOT NULL DEFAULT '' COMMENT '权限值(rbac),其他角色类型则依次存放v0-v5...',
   v3 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
   v4 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
   v5 varchar(64) NOT NULL DEFAULT '' COMMENT 'ext',
   PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;`, a.GetPrefix(),"casbin_rule")
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='casbin权限规则表';`, a.GetPrefix(),"casbin_rule")
 		_, err = a.Engin.NewSession().Execute(sqlStr)
 	}
 
@@ -141,7 +141,8 @@ func (a *CasbinGoroseAdapter) builCasbinRule(ptype string, rule []string) (cr Ca
 func (a *CasbinGoroseAdapter) AddPolicy(sec string, ptype string, rule []string) error {
 	var cr = a.builCasbinRule(ptype, rule)
 	// insert to db
-	aff,err := a.Engin.NewOrm().Insert(&cr)
+	var db = a.Engin.NewOrm()
+	aff,err := db.Insert(&cr)
 	if err!=nil {
 		return err
 	}
@@ -159,28 +160,15 @@ func (a *CasbinGoroseAdapter) RemovePolicy(sec string, ptype string, rule []stri
 
 // RemoveFilteredPolicy removes policy rules that match the filter from the storage.
 func (a *CasbinGoroseAdapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error {
-
 	var line CasbinRule
-
 	line.PType = ptype
-	if fieldIndex <= 0 && 0 < fieldIndex+len(fieldValues) {
-		line.V0 = fieldValues[0-fieldIndex]
-	}
-	if fieldIndex <= 1 && 1 < fieldIndex+len(fieldValues) {
-		line.V1 = fieldValues[1-fieldIndex]
-	}
-	if fieldIndex <= 2 && 2 < fieldIndex+len(fieldValues) {
-		line.V2 = fieldValues[2-fieldIndex]
-	}
-	if fieldIndex <= 3 && 3 < fieldIndex+len(fieldValues) {
-		line.V3 = fieldValues[3-fieldIndex]
-	}
-	if fieldIndex <= 4 && 4 < fieldIndex+len(fieldValues) {
-		line.V4 = fieldValues[4-fieldIndex]
-	}
-	if fieldIndex <= 5 && 5 < fieldIndex+len(fieldValues) {
-		line.V5 = fieldValues[5-fieldIndex]
-	}
+	idx := fieldIndex+len(fieldValues)
+	if fieldIndex <= 0 && 0 < idx { line.V0 = fieldValues[0-fieldIndex] }
+	if fieldIndex <= 1 && 1 < idx { line.V1 = fieldValues[1-fieldIndex] }
+	if fieldIndex <= 2 && 2 < idx { line.V2 = fieldValues[2-fieldIndex] }
+	if fieldIndex <= 3 && 3 < idx { line.V3 = fieldValues[3-fieldIndex] }
+	if fieldIndex <= 4 && 4 < idx { line.V4 = fieldValues[4-fieldIndex] }
+	if fieldIndex <= 5 && 5 < idx { line.V5 = fieldValues[5-fieldIndex] }
 	return a.rawDelete(&line)
 }
 
